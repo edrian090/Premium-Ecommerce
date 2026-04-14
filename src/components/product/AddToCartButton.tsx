@@ -2,8 +2,10 @@
 
 import { useCartStore } from '@/store/cartStore';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, XCircle } from 'lucide-react';
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface AddToCartButtonProps {
   product: {
@@ -12,18 +14,20 @@ interface AddToCartButtonProps {
     price: number;
     image: string;
   };
+  stock: number;
 }
 
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-
-export function AddToCartButton({ product }: AddToCartButtonProps) {
+export function AddToCartButton({ product, stock }: AddToCartButtonProps) {
   const { data: session } = useSession();
   const router = useRouter();
   const addItem = useCartStore((state) => state.addItem);
   const [added, setAdded] = useState(false);
 
+  const isOutOfStock = stock <= 0;
+
   const handleAddToCart = () => {
+    if (isOutOfStock) return;
+
     if (!session) {
       router.push('/login?callbackUrl=' + encodeURIComponent(window.location.pathname));
       return;
@@ -33,6 +37,19 @@ export function AddToCartButton({ product }: AddToCartButtonProps) {
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
+
+  if (isOutOfStock) {
+    return (
+      <Button 
+        size="lg" 
+        disabled
+        className="w-full md:w-auto h-14 px-8 text-lg bg-neutral-400 text-white cursor-not-allowed"
+      >
+        <XCircle className="mr-2 h-5 w-5" />
+        Out of Stock
+      </Button>
+    );
+  }
 
   return (
     <Button 

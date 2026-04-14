@@ -81,17 +81,29 @@ export default async function ProductsPage({
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {products.map((product) => (
-                <Card key={product.id} className="group overflow-hidden border-none shadow-md hover:shadow-xl transition-all duration-300 rounded-xl bg-[#F5F5F5]">
+                <Card key={product.id} className={`group overflow-hidden border-none shadow-md hover:shadow-xl transition-all duration-300 rounded-xl bg-[#F5F5F5] ${product.stock <= 0 ? 'opacity-80' : ''}`}>
                   <div className="relative aspect-square overflow-hidden bg-white border-b border-neutral-100">
                     <Image 
                       src={parseImages(product.images)?.[0] || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop'} 
                       alt={product.name} 
                       fill 
-                      className="object-cover transition-transform duration-500 group-hover:scale-110" 
+                      className={`object-cover transition-transform duration-500 ${product.stock <= 0 ? 'grayscale' : 'group-hover:scale-110'}`} 
                     />
                     <div className="absolute top-4 right-4 bg-white text-neutral-800 text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10 border border-neutral-100">
                       {product.category?.name || 'Uncategorized'}
                     </div>
+                    {product.stock <= 0 && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20">
+                        <span className="bg-red-600 text-white text-sm font-bold px-5 py-2 rounded-full shadow-lg tracking-wide">
+                          OUT OF STOCK
+                        </span>
+                      </div>
+                    )}
+                    {product.stock > 0 && product.stock <= 5 && (
+                      <div className="absolute top-4 left-4 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10">
+                        Only {product.stock} left
+                      </div>
+                    )}
                   </div>
                   <CardContent className="p-5">
                     <h3 className="font-bold text-lg text-[#1A1A2E] mb-2 truncate">{product.name}</h3>

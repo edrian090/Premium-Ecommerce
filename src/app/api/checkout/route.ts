@@ -115,6 +115,33 @@ export async function POST(req: Request) {
     const selectedPaymentMethod = paymentMethod || 'COD';
     const initialStatus = selectedPaymentMethod === 'CARD' ? 'TO_PAY' : 'TO_PAY';
 
+    // Validate stock availability before creating the order
+    const productIds = items.map((item: any) => item.id);
+    const products = await prisma.product.findMany({
+      where: { id: { in: productIds } },
+    });
+
+    const outOfStock: string[] = [];
+    for (const item of items) {
+      const product = products.find((p) => p.id === item.id);
+      if (!product) {
+        outOfStock.push(`${item.name || item.id} (product not found)`);
+      } else if (product.stock < item.quantity) {
+        outOfStock.push(
+          product.stock === 0
+            ? `${product.name} is out of stock`
+            : `${product.name} only has ${product.stock} left in stock`
+        );
+      }
+    }
+
+    if (outOfStock.length > 0) {
+      return NextResponse.json(
+        { error: `Insufficient stock: ${outOfStock.join('; ')}` },
+        { status: 400 }
+      );
+    }
+
     // Create the order in the database
     const order = await prisma.order.create({
       data: {
@@ -134,6 +161,14 @@ export async function POST(req: Request) {
         }
       }
     });
+
+    // Decrement stock for each ordered product
+    for (const item of items) {
+      await prisma.product.update({
+        where: { id: item.id },
+        data: { stock: { decrement: item.quantity } },
+      });
+    }
 
     // For COD or GCash: simulate payment, mark as TO_SHIP directly
     if (selectedPaymentMethod === 'COD' || selectedPaymentMethod === 'GCASH') {

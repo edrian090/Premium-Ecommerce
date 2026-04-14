@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { AddToCartButton } from '@/components/product/AddToCartButton';
 import { WishlistButton } from '@/components/product/WishlistButton';
-import { Shield, Truck, RotateCcw, Star } from 'lucide-react';
+import { Shield, Truck, RotateCcw, Star, AlertTriangle } from 'lucide-react';
 import { parseImages } from '@/lib/utils';
 
 import prisma from '@/lib/prisma';
@@ -48,9 +48,25 @@ export default async function ProductPage({ params }: { params: { id: string } }
           <h1 className="text-4xl md:text-5xl font-extrabold text-[#1A1A2E] mb-4 tracking-tight leading-tight">
             {product.name}
           </h1>
-          <div className="text-3xl font-bold text-neutral-900 mb-6">
+          <div className="text-3xl font-bold text-neutral-900 mb-4">
             ${product.price.toFixed(2)}
           </div>
+
+          {/* Stock Status */}
+          {product.stock <= 0 ? (
+            <div className="flex items-center gap-2 mb-6 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
+              <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0" />
+              <span className="text-red-700 font-semibold">Out of Stock</span>
+            </div>
+          ) : product.stock <= 5 ? (
+            <div className="flex items-center gap-2 mb-6 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0" />
+              <span className="text-amber-700 font-semibold">Only {product.stock} left in stock — order soon!</span>
+            </div>
+          ) : (
+            <div className="mb-6 text-sm text-green-600 font-medium">✓ In Stock ({product.stock} available)</div>
+          )}
+
           <p className="text-lg text-gray-600 mb-8 leading-relaxed">
             {product.description}
           </p>
@@ -65,7 +81,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 align-middle mb-10 pt-6 border-t border-gray-200">
-            <AddToCartButton product={{ id: product.id, name: product.name, price: product.price, image: parseImages(product.images)[0] }} />
+            <AddToCartButton product={{ id: product.id, name: product.name, price: product.price, image: parseImages(product.images)[0] }} stock={product.stock} />
             <WishlistButton productId={product.id} />
           </div>
 

@@ -90,6 +90,14 @@ export default function AdminSidebar() {
           <BarChart3 className="h-[18px] w-[18px] flex-shrink-0 text-white/45 group-hover:text-white transition-colors" />
           <span className="flex-1">Sales Report</span>
         </Link>
+        <Link
+          href="/admin/product-performance"
+          onClick={() => setMobileOpen(false)}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/55 hover:bg-white/10 hover:text-white transition-all duration-200 group"
+        >
+          <BarChart3 className="h-[18px] w-[18px] flex-shrink-0 text-white/45 group-hover:text-white transition-colors" />
+          <span className="flex-1">Product Tracking</span>
+        </Link>
       </nav>
 
       {/* Bottom - Sign Out */}

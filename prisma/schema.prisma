@@ -37,6 +37,7 @@ model Product {
   name        String
   description String
   price       Float
+  discountPercent Int @default(0)
   images      String   @default("[]") // stored as JSON String for SQLite
   stock       Int      @default(0)
   categoryId  String

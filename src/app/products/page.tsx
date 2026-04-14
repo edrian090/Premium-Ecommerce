@@ -92,6 +92,11 @@ export default async function ProductsPage({
                     <div className="absolute top-4 right-4 bg-white text-neutral-800 text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10 border border-neutral-100">
                       {product.category?.name || 'Uncategorized'}
                     </div>
+                    {product.discountPercent > 0 && product.stock > 0 && (
+                      <div className="absolute top-12 right-4 bg-[#E94560] text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">
+                        {product.discountPercent}% OFF
+                      </div>
+                    )}
                     {product.stock <= 0 && (
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20">
                         <span className="bg-red-600 text-white text-sm font-bold px-5 py-2 rounded-full shadow-lg tracking-wide">
@@ -110,7 +115,16 @@ export default async function ProductsPage({
                     <p className="text-sm text-gray-500 line-clamp-2 md:mb-4">{product.description}</p>
                   </CardContent>
                   <CardFooter className="p-5 pt-0 flex items-center justify-between">
-                    <span className="text-xl font-extrabold text-[#E94560]">${product.price.toFixed(2)}</span>
+                    <div className="flex flex-col">
+                      {product.discountPercent > 0 ? (
+                        <>
+                          <span className="text-xl font-extrabold text-[#E94560]">${(product.price * (1 - product.discountPercent / 100)).toFixed(2)}</span>
+                          <span className="text-sm font-medium text-neutral-400 line-through">${product.price.toFixed(2)}</span>
+                        </>
+                      ) : (
+                        <span className="text-xl font-extrabold text-[#E94560]">${product.price.toFixed(2)}</span>
+                      )}
+                    </div>
                     <Link href={`/product/${product.id}`}>
                       <Button variant="outline" className="border-[#0F3460] text-[#0F3460] hover:bg-[#0F3460] hover:text-white transition-colors">
                         Details

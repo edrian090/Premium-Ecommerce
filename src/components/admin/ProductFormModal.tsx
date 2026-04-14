@@ -14,10 +14,10 @@ interface Product {
   name: string;
   description: string;
   price: number | string;
-  stock: number | string;
   categoryId: string;
   newCategoryName?: string;
   images: string[];
+  discountPercent: number | string;
 }
 
 interface ProductFormModalProps {
@@ -35,6 +35,7 @@ const EMPTY_FORM: Product = {
   categoryId: '',
   newCategoryName: '',
   images: [],
+  discountPercent: 0,
 };
 
 export default function ProductFormModal({ open, onClose, onSuccess, product }: ProductFormModalProps) {
@@ -194,8 +195,8 @@ export default function ProductFormModal({ open, onClose, onSuccess, product }: 
             />
           </div>
 
-          {/* Price + Stock */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* Price + Stock + Discount */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-neutral-700 mb-1.5">
                 Price ($) <span className="text-red-500">*</span>
@@ -220,6 +221,21 @@ export default function ProductFormModal({ open, onClose, onSuccess, product }: 
                 min="0"
                 value={form.stock}
                 onChange={(e) => setForm((p) => ({ ...p, stock: e.target.value }))}
+                required
+                placeholder="0"
+                className="w-full px-4 py-2.5 rounded-lg border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F3460]/30 focus:border-[#0F3460] transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-1.5">
+                Discount (%) <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={form.discountPercent}
+                onChange={(e) => setForm((p) => ({ ...p, discountPercent: e.target.value }))}
                 required
                 placeholder="0"
                 className="w-full px-4 py-2.5 rounded-lg border border-neutral-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F3460]/30 focus:border-[#0F3460] transition-all"

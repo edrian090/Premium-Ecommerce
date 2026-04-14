@@ -48,8 +48,16 @@ export default async function ProductPage({ params }: { params: { id: string } }
           <h1 className="text-4xl md:text-5xl font-extrabold text-[#1A1A2E] mb-4 tracking-tight leading-tight">
             {product.name}
           </h1>
-          <div className="text-3xl font-bold text-neutral-900 mb-4">
-            ${product.price.toFixed(2)}
+          <div className="text-3xl font-bold text-neutral-900 mb-4 flex items-end gap-3">
+            {product.discountPercent > 0 ? (
+              <>
+                <span className="text-[#E94560]">${(product.price * (1 - product.discountPercent / 100)).toFixed(2)}</span>
+                <span className="text-xl text-neutral-400 line-through mb-0.5">${product.price.toFixed(2)}</span>
+                <span className="text-sm font-bold bg-[#E94560]/10 text-[#E94560] px-2 py-1 rounded-lg mb-1">{product.discountPercent}% OFF</span>
+              </>
+            ) : (
+              <span>${product.price.toFixed(2)}</span>
+            )}
           </div>
 
           {/* Stock Status */}
@@ -81,7 +89,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 align-middle mb-10 pt-6 border-t border-gray-200">
-            <AddToCartButton product={{ id: product.id, name: product.name, price: product.price, image: parseImages(product.images)[0] }} stock={product.stock} />
+            <AddToCartButton product={{ id: product.id, name: product.name, price: product.discountPercent > 0 ? (product.price * (1 - product.discountPercent / 100)) : product.price, image: parseImages(product.images)[0] }} stock={product.stock} />
             <WishlistButton productId={product.id} />
           </div>
 

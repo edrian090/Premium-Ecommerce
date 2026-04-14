@@ -61,11 +61,11 @@ export default async function Home() {
                         OUT OF STOCK
                       </span>
                     </div>
-                  ) : (
+                  ) : product.discountPercent > 0 ? (
                     <div className="absolute top-4 right-4 bg-[#E94560] text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">
-                      SALE
+                      {product.discountPercent}% OFF
                     </div>
-                  )}
+                  ) : null}
                   {product.stock > 0 && product.stock <= 5 && (
                     <div className="absolute top-4 left-4 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10">
                       Only {product.stock} left
@@ -77,7 +77,16 @@ export default async function Home() {
                   <p className="text-sm text-gray-500 line-clamp-2 md:mb-4">{product.description}</p>
                 </CardContent>
                 <CardFooter className="p-6 pt-0 flex items-center justify-between">
-                  <span className="text-xl font-extrabold text-[#E94560]">${product.price.toFixed(2)}</span>
+                  <div className="flex flex-col">
+                    {product.discountPercent > 0 ? (
+                      <>
+                        <span className="text-xl font-extrabold text-[#E94560]">${(product.price * (1 - product.discountPercent / 100)).toFixed(2)}</span>
+                        <span className="text-sm font-medium text-neutral-400 line-through">${product.price.toFixed(2)}</span>
+                      </>
+                    ) : (
+                      <span className="text-xl font-extrabold text-[#E94560]">${product.price.toFixed(2)}</span>
+                    )}
+                  </div>
                   <Link href={`/product/${product.id}`}>
                     <Button variant="outline" className="border-[#0F3460] text-[#0F3460] hover:bg-[#0F3460] hover:text-white transition-colors">
                       Details

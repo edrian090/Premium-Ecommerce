@@ -44,7 +44,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8 rounded-2xl bg-white p-10 shadow-xl border border-neutral-100">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight text-[#1A1A2E]">
-            Welcome Back
+            Sign in to your account
           </h2>
           <p className="mt-2 text-center text-sm text-neutral-500">
             Or{" "}

@@ -5,10 +5,28 @@ import { Button } from '@/components/ui/button';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function CartPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const { items, removeItem, updateQuantity, getCartTotal, clearCart } = useCartStore();
   const total = getCartTotal();
+
+  if (status === 'unauthenticated') {
+    return (
+      <div className="container mx-auto px-4 py-32 text-center flex flex-col items-center justify-center min-h-[60vh]">
+        <ShoppingCartIcon className="h-24 w-24 text-gray-300 mb-6" />
+        <h2 className="text-3xl font-bold text-[#1A1A2E] mb-4">Please log in to use the Cart</h2>
+        <p className="text-gray-500 mb-8 max-w-md">You must be logged in to view your cart items or add new products.</p>
+        <Link href={`/login?callbackUrl=${encodeURIComponent('/cart')}`}>
+          <Button size="lg" className="bg-[#0F3460] hover:bg-[#1A1A2E] text-white px-10">Log In</Button>
+        </Link>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { CartSessionEnforcer } from './CartSessionEnforcer';
 
 export function Header() {
   const { data: session } = useSession();
@@ -27,6 +28,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white border-neutral-200">
+      <CartSessionEnforcer />
       <div className="container mx-auto flex h-16 items-center px-4 md:px-6">
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <span className="text-xl font-bold tracking-tight text-neutral-900">Storefront</span>

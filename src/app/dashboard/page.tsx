@@ -2,7 +2,7 @@ import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Package, Heart, History, ShoppingBag, Clock, Truck, Star } from "lucide-react";
+import { User, Package, Heart, History, ShoppingBag, Truck, Star } from "lucide-react";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { ProfileSettings } from "@/components/dashboard/ProfileSettings";

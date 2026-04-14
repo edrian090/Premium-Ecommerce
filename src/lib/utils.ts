@@ -9,7 +9,7 @@ export function parseImages(imagesStr: string | any): string[] {
   if (Array.isArray(imagesStr)) return imagesStr;
   try {
     return JSON.parse(imagesStr || "[]");
-  } catch (e) {
+  } catch (_e) {
     if (typeof imagesStr === "string" && imagesStr.length > 0) return [imagesStr];
     return [];
   }

@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { 
-  Package, Clock, Truck, PackageCheck, Star, 
-  CheckCircle2, ShoppingBag, ChevronRight, Loader2,
+  Package, Truck, Star, 
+  CheckCircle2, ShoppingBag, Loader2,
   CreditCard, Wallet, Banknote, Tag
 } from 'lucide-react';
 import { OrderReviewModal } from '@/components/product/OrderReviewModal';
@@ -60,8 +60,8 @@ interface Order {
   items: OrderItem[];
 }
 
-export default function PurchasesPage() {
-  const { data: session, status: authStatus } = useSession();
+function PurchasesContent() {
+  const { status: authStatus } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'ALL';
@@ -322,5 +322,17 @@ export default function PurchasesPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function PurchasesPage() {
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-32 flex justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[#0F3460]" />
+      </div>
+    }>
+      <PurchasesContent />
+    </Suspense>
   );
 }

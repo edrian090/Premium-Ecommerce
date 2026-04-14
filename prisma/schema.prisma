@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id               String    @id @default(cuid())
+  name             String?
+  email            String?   @unique
+  emailVerified    DateTime?
+  image            String?
+  password         String?
+  role             String    @default("USER")
+  phone            String?
+  address          String?
+  city             String?
+  zip              String?
+  profileCompleted Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  orders        Order[]
+  reviews       Review[]
+  wishlist      Wishlist?
+}
+
+// Enums are removed for SQLite support
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  images      String   @default("[]") // stored as JSON String for SQLite
+  stock       Int      @default(0)
+  categoryId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category    Category @relation(fields: [categoryId], references: [id])
+  reviews     Review[]
+  orderItems  OrderItem[]
+  wishlists   WishlistProduct[]
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  products    Product[]
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  userId          String
+  stripeSessionId String?     @unique
+  status          String      @default("TO_PAY")
+  totalAmount     Float
+  shippingAddress String?
+  paymentMethod   String      @default("COD")
+  voucherCode     String?
+  discountAmount  Float       @default(0)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  user          User        @relation(fields: [userId], references: [id])
+  items         OrderItem[]
+}
+
+// Order status lifecycle: TO_PAY -> TO_SHIP -> TO_RECEIVE -> DELIVERED -> TO_RATE -> COMPLETED
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int
+  comment   String?
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model Wishlist {
+  id        String            @id @default(cuid())
+  userId    String            @unique
+  user      User              @relation(fields: [userId], references: [id])
+  items     WishlistProduct[]
+}
+
+model WishlistProduct {
+  wishlistId String
+  productId  String
+
+  wishlist   Wishlist @relation(fields: [wishlistId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id])
+
+  @@id([wishlistId, productId])
+}
+
+model Voucher {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  description   String
+  discountType  String    @default("PERCENTAGE")
+  discountValue Float
+  minSpend      Float     @default(0)
+  maxDiscount   Float?
+  usageLimit    Int       @default(100)
+  usedCount     Int       @default(0)
+  isActive      Boolean   @default(true)
+  expiresAt     DateTime?
+  createdAt     DateTime  @default(now())
+}
+
+// NextAuth models
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

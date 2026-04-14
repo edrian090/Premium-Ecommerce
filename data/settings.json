@@ -1,0 +1,23 @@
+{
+  "storeName": "My Store",
+  "contactEmail": "admin@mystore.com",
+  "currency": "USD",
+  "currencySymbol": "$",
+  "maintenanceMode": false,
+  "allowRegistrations": true,
+  "ordersPerPage": 20,
+  "featuredProductIds": [],
+  "storeDescription": "",
+  "storeUrl": "",
+  "taxRate": 0,
+  "freeShippingThreshold": 0,
+  "enableEmailNotifications": true,
+  "newOrderNotification": true,
+  "lowStockNotification": true,
+  "lowStockThreshold": 5,
+  "enableReviews": true,
+  "requireApproval": false,
+  "maxOrderItems": 50,
+  "sessionTimeout": 30,
+  "timezone": "UTC"
+}

@@ -1,100 +1,85 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import prisma from '@/lib/prisma';
+import Image from 'next/image';
 
-export default function Home() {
+export default async function Home() {
+  // Let's fetch some products from the database later.
+  // For now, since the DB is empty, let's use some placeholder data to scaffold the UI.
+  
+  // Fetch products from database
+  const featuredProducts = await prisma.product.findMany({
+    take: 4,
+  });
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section */}
+      <section className="relative w-full py-20 md:py-32 bg-[#1A1A2E] overflow-hidden">
+        <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center" />
+        <div className="container relative z-10 mx-auto px-4 md:px-6 flex flex-col items-center text-center">
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-white mb-6">
+            Elevate Your <span className="text-[#E94560]">Lifestyle</span>
+          </h1>
+          <p className="max-w-[600px] text-lg text-gray-300 mb-8 font-medium">
+            Discover a curated collection of premium electronics, fashion, and accessories designed for modern living.
+          </p>
+          <Link href="/products">
+            <Button size="lg" className="bg-[#E94560] hover:bg-[#c8354c] text-white px-8 py-6 text-lg rounded-full font-bold shadow-[0_0_15px_rgba(233,69,96,0.4)] transition-all hover:scale-105">
+              Shop Now
+            </Button>
+          </Link>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      </section>
+
+      {/* Featured Products */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex items-center justify-between mb-10">
+            <h2 className="text-3xl font-bold tracking-tight text-[#1A1A2E]">Featured Products</h2>
+            <Link href="/products" className="text-[#0F3460] font-semibold hover:underline">
+              View all products →
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredProducts.map((product) => (
+              <Card key={product.id} className="group overflow-hidden border-none shadow-lg hover:shadow-xl transition-all duration-300 rounded-xl bg-[#F5F5F5]">
+                <div className="relative aspect-square overflow-hidden bg-white">
+                  <Image 
+                    src={JSON.parse(product.images || '[]')?.[0] || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop'} 
+                    alt={product.name} 
+                    fill 
+                    className="object-cover transition-transform duration-500 group-hover:scale-110" 
+                  />
+                  <div className="absolute top-4 right-4 bg-[#E94560] text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">
+                    SALE
+                  </div>
+                </div>
+                <CardContent className="p-6">
+                  <h3 className="font-bold text-lg text-[#1A1A2E] mb-2 truncate">{product.name}</h3>
+                  <p className="text-sm text-gray-500 line-clamp-2 md:mb-4">{product.description}</p>
+                </CardContent>
+                <CardFooter className="p-6 pt-0 flex items-center justify-between">
+                  <span className="text-xl font-extrabold text-[#E94560]">${product.price.toFixed(2)}</span>
+                  <Link href={`/product/${product.id}`}>
+                    <Button variant="outline" className="border-[#0F3460] text-[#0F3460] hover:bg-[#0F3460] hover:text-white transition-colors">
+                      Details
+                    </Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* Footer minimal */}
+      <footer className="bg-[#0F3460] text-white py-12 mt-auto">
+        <div className="container mx-auto px-4 md:px-6 text-center">
+          <p className="text-gray-400">© 2026 Storefront. All rights reserved.</p>
+        </div>
       </footer>
     </div>
   );

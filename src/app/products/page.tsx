@@ -70,68 +70,63 @@ export default async function ProductsPage({
           </div>
 
           {products.length === 0 ? (
-            <div className="text-center py-20 bg-neutral-50 rounded-xl border-2 border-dashed border-neutral-200">
+            <div className="text-center py-20 bg-neutral-50 rounded-2xl border border-dashed border-neutral-200">
               <PackageSearch className="mx-auto h-12 w-12 text-neutral-300 mb-4" />
               <h2 className="text-xl font-bold text-neutral-700">No products found</h2>
               <p className="text-neutral-500 mt-2">Try adjusting your filters or search query.</p>
               <Link href="/products">
-                <Button className="mt-6 bg-[#0F3460] hover:bg-[#1A1A2E] text-white">Clear Filters</Button>
+                <Button className="mt-6 bg-[#003d29] hover:bg-[#002b1c] text-white rounded-full px-6">Clear Filters</Button>
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
               {products.map((product) => (
-                <Card key={product.id} className={`group overflow-hidden border-none shadow-md hover:shadow-xl transition-all duration-300 rounded-xl bg-[#F5F5F5] ${product.stock <= 0 ? 'opacity-80' : ''}`}>
-                  <div className="relative aspect-square overflow-hidden bg-white border-b border-neutral-100">
+                <div key={product.id} className="group flex flex-col">
+                  <Link href={`/product/${product.id}`} className="block relative aspect-square overflow-hidden bg-neutral-100 rounded-2xl mb-4">
                     <Image 
                       src={parseImages(product.images)?.[0] || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop'} 
                       alt={product.name} 
                       fill 
-                      className={`object-cover transition-transform duration-500 ${product.stock <= 0 ? 'grayscale' : 'group-hover:scale-110'}`} 
+                      className={`object-cover transition-transform duration-700 ${product.stock <= 0 ? 'grayscale' : 'group-hover:scale-105'}`} 
                     />
-                    <div className="absolute top-4 right-4 bg-white text-neutral-800 text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10 border border-neutral-100">
+                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-neutral-800 text-[10px] font-bold px-2 py-1 rounded-md shadow-sm">
                       {product.category?.name || 'Uncategorized'}
                     </div>
                     {product.discountPercent > 0 && product.stock > 0 && (
-                      <div className="absolute top-12 right-4 bg-[#E94560] text-white text-xs font-bold px-3 py-1 rounded-full shadow-md z-10">
-                        {product.discountPercent}% OFF
+                      <div className="absolute top-3 left-3 bg-white text-neutral-900 text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+                        -{product.discountPercent}%
                       </div>
                     )}
                     {product.stock <= 0 && (
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-20">
-                        <span className="bg-red-600 text-white text-sm font-bold px-5 py-2 rounded-full shadow-lg tracking-wide">
-                          OUT OF STOCK
+                      <div className="absolute inset-x-0 bottom-0 bg-white/90 backdrop-blur-sm py-2 text-center border-t border-neutral-200">
+                        <span className="text-neutral-800 text-xs font-bold tracking-widest uppercase">
+                          Out of Stock
                         </span>
                       </div>
                     )}
-                    {product.stock > 0 && product.stock <= 5 && (
-                      <div className="absolute top-4 left-4 bg-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10">
-                        Only {product.stock} left
+                  </Link>
+                  <div className="flex flex-col flex-1">
+                    <div className="flex items-start justify-between gap-4 mb-1">
+                      <Link href={`/product/${product.id}`}>
+                        <h3 className="font-bold text-[15px] leading-snug text-neutral-900 group-hover:text-[#003d29] transition-colors">{product.name}</h3>
+                      </Link>
+                      <div className="flex flex-col items-end text-right shrink-0">
+                        {product.discountPercent > 0 ? (
+                          <>
+                            <span className="font-bold text-neutral-900">${(product.price * (1 - product.discountPercent / 100)).toFixed(2)}</span>
+                            <span className="text-xs font-semibold text-neutral-400 line-through">${product.price.toFixed(2)}</span>
+                          </>
+                        ) : (
+                          <span className="font-bold text-neutral-900">${product.price.toFixed(2)}</span>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <CardContent className="p-5">
-                    <h3 className="font-bold text-lg text-[#1A1A2E] mb-2 truncate">{product.name}</h3>
-                    <p className="text-sm text-gray-500 line-clamp-2 md:mb-4">{product.description}</p>
-                  </CardContent>
-                  <CardFooter className="p-5 pt-0 flex items-center justify-between">
-                    <div className="flex flex-col">
-                      {product.discountPercent > 0 ? (
-                        <>
-                          <span className="text-xl font-extrabold text-[#E94560]">${(product.price * (1 - product.discountPercent / 100)).toFixed(2)}</span>
-                          <span className="text-sm font-medium text-neutral-400 line-through">${product.price.toFixed(2)}</span>
-                        </>
-                      ) : (
-                        <span className="text-xl font-extrabold text-[#E94560]">${product.price.toFixed(2)}</span>
-                      )}
                     </div>
-                    <Link href={`/product/${product.id}`}>
-                      <Button variant="outline" className="border-[#0F3460] text-[#0F3460] hover:bg-[#0F3460] hover:text-white transition-colors">
-                        Details
-                      </Button>
-                    </Link>
-                  </CardFooter>
-                </Card>
+                    <p className="text-xs text-neutral-500 line-clamp-1 mt-1 mb-4">{product.description}</p>
+                    <Button variant="outline" className="w-full mt-auto rounded-full border-neutral-200 text-neutral-800 hover:bg-[#003d29] hover:text-white hover:border-[#003d29] transition-all font-semibold h-10 text-[13px]">
+                      <Link href={`/product/${product.id}`} className="w-full text-center">View Product</Link>
+                    </Button>
+                  </div>
+                </div>
               ))}
             </div>
           )}

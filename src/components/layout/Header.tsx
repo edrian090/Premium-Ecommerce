@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useSession, signOut, signIn } from 'next-auth/react';
 import { useCartStore } from '@/store/cartStore';
-import { ShoppingCart, User, LogOut, Search, ShieldAlert, Heart, Package } from 'lucide-react';
+import { ShoppingCart, User, Search, ChevronDown, LogOut, Package, Heart, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
@@ -27,80 +27,108 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white border-neutral-200">
+    <header className="sticky top-0 z-50 w-full bg-white border-b border-neutral-100 shadow-sm">
       <CartSessionEnforcer />
-      <div className="container mx-auto flex h-16 items-center px-4 md:px-6">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
-          <span className="text-xl font-bold tracking-tight text-neutral-900">Storefront</span>
+      <div className="container mx-auto flex h-20 items-center px-4 md:px-6 justify-between">
+        {/* Left: Logo */}
+        <Link href="/" className="flex items-center gap-2 mr-8 group">
+          <div className="relative flex items-center justify-center w-8 h-8">
+            <ShoppingCart className="w-7 h-7 text-[#003d29]" />
+            <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full border-2 border-white"></div>
+          </div>
+          <span className="text-2xl font-extrabold tracking-tight text-[#003d29]">Shopcart</span>
         </Link>
-        <nav className="flex items-center space-x-6 text-sm font-medium">
-          <Link href="/products" className="transition-colors hover:text-neutral-900 text-neutral-500">Products</Link>
+        
+        {/* Middle: Navigation Links */}
+        <nav className="hidden lg:flex items-center space-x-8 text-[15px] font-semibold text-neutral-700">
+          <Link href="/products" className="flex items-center gap-1 hover:text-[#003d29] transition-colors">
+            Categories <ChevronDown className="w-4 h-4 ml-0.5 mt-0.5" />
+          </Link>
+          <Link href="/deals" className="hover:text-[#003d29] transition-colors">Deals</Link>
+          <Link href="/new" className="hover:text-[#003d29] transition-colors">What's New</Link>
+          <Link href="/delivery" className="hover:text-[#003d29] transition-colors">Delivery</Link>
         </nav>
         
-        <form onSubmit={handleSearch} className="flex-1 max-w-md mx-auto ml-8 relative hidden md:block">
-          <Input 
-            type="search" 
-            placeholder="Search all products..." 
-            className="w-full pl-9 bg-neutral-50 border-neutral-200 focus-visible:ring-[#0F3460]"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400" />
-        </form>
+        {/* Right: Search and Actions */}
+        <div className="flex items-center gap-6 ml-auto">
+          {/* Search Bar */}
+          <form onSubmit={handleSearch} className="relative hidden md:block max-w-[280px] lg:min-w-[320px]">
+            <Input 
+              type="search" 
+              placeholder="Search Product" 
+              className="w-full pr-10 pl-5 rounded-full bg-neutral-100 border-none h-11 text-[15px] focus-visible:ring-1 focus-visible:ring-[#003d29] placeholder:text-neutral-500"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="submit" className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-800">
+              <Search className="h-5 w-5" />
+            </button>
+          </form>
 
-        <div className="flex items-center space-x-4 ml-auto">
-          <Link href="/cart">
-            <Button variant="ghost" size="icon" className="relative">
-              <ShoppingCart className="h-5 w-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                  {cartCount}
-                </span>
-              )}
-            </Button>
-          </Link>
-
+          {/* Account */}
           {session ? (
-            <div className="flex items-center gap-2">
-              {(session?.user as any)?.role === 'ADMIN' && (
-                <Link href="/admin">
-                  <Button variant="ghost" className="text-red-600 hover:text-red-700 hover:bg-red-50 font-bold flex items-center gap-2 hidden sm:flex">
-                    <ShieldAlert className="h-4 w-4" />
-                    Admin
+            <div className="flex items-center gap-4">
+              <Link href="/dashboard" className="flex items-center gap-2 text-neutral-800 hover:text-[#003d29] font-medium transition-colors">
+                <User className="h-6 w-6 stroke-[1.5]" />
+                <span className="hidden sm:inline-block">Account</span>
+              </Link>
+              
+              <Link href="/cart" className="flex items-center gap-2 text-neutral-800 hover:text-[#003d29] font-medium transition-colors relative">
+                <div className="relative">
+                  <ShoppingCart className="h-6 w-6 stroke-[1.5]" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#003d29] text-[10px] font-bold text-white shadow-sm">
+                      {cartCount}
+                    </span>
+                  )}
+                </div>
+                <span className="hidden sm:inline-block">Cart</span>
+              </Link>
+              
+              {/* Additional Logged-in Links (Wishlist, Admin, Logout) */}
+              <div className="flex items-center gap-2 border-l border-neutral-200 pl-4 ml-2">
+                {(session?.user as any)?.role === 'ADMIN' && (
+                  <Link href="/admin" title="Admin">
+                    <Button variant="ghost" size="icon" className="text-red-600 hover:bg-red-50 hover:text-red-700">
+                      <ShieldAlert className="h-5 w-5" />
+                    </Button>
+                  </Link>
+                )}
+                <Link href="/wishlist" title="Wishlist">
+                  <Button variant="ghost" size="icon" className="text-neutral-500 hover:text-red-500">
+                    <Heart className="h-5 w-5" />
                   </Button>
                 </Link>
-              )}
-              <Link href="/wishlist">
-                <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50">
-                  <Heart className="h-5 w-5" />
+                <Link href="/purchases" title="Purchases">
+                  <Button variant="ghost" size="icon" className="text-neutral-500 hover:text-[#003d29]">
+                    <Package className="h-5 w-5" />
+                  </Button>
+                </Link>
+                <Button variant="ghost" size="icon" onClick={() => {
+                  useCartStore.getState().clearLocalCart();
+                  signOut({ callbackUrl: '/' });
+                }} className="text-neutral-500 hover:text-neutral-800" title="Log out">
+                  <LogOut className="h-5 w-5" />
                 </Button>
-              </Link>
-              <Link href="/purchases">
-                <Button variant="ghost" size="icon" className="text-[#0F3460] hover:text-[#1A1A2E] hover:bg-blue-50">
-                  <Package className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Link href="/dashboard">
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
-                </Button>
-              </Link>
-              <Button variant="ghost" size="icon" onClick={() => {
-                useCartStore.getState().clearCart();
-                signOut({ callbackUrl: '/' });
-              }}>
-                <LogOut className="h-5 w-5" />
-              </Button>
+              </div>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" onClick={() => signIn()} className="text-neutral-600 hover:text-neutral-900 hidden sm:inline-flex">
-                Log in
-              </Button>
-              <Link href="/register">
-                <Button variant="default" className="bg-[#0F3460] hover:bg-[#1A1A2E] text-white">
-                  Sign Up
-                </Button>
+            <div className="flex items-center gap-5 lg:gap-6">
+              <Link href="/login" className="flex items-center gap-2 text-neutral-800 hover:text-[#003d29] font-medium transition-colors">
+                <User className="h-6 w-6 stroke-[1.5]" />
+                <span className="hidden sm:inline-block">Account</span>
+              </Link>
+              
+              <Link href="/cart" className="flex items-center gap-2 text-neutral-800 hover:text-[#003d29] font-medium transition-colors relative">
+                <div className="relative">
+                  <ShoppingCart className="h-6 w-6 stroke-[1.5]" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#003d29] text-[10px] font-bold text-white shadow-sm">
+                      {cartCount}
+                    </span>
+                  )}
+                </div>
+                <span className="hidden sm:inline-block">Cart</span>
               </Link>
             </div>
           )}

@@ -13,6 +13,7 @@ interface Product {
   description: string;
   price: number;
   stock: number;
+  discountPercent: number;
   images: string[];
   categoryId: string;
   createdAt: string;

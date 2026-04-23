@@ -1,140 +1,179 @@
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import { AddToCartButton } from '@/components/product/AddToCartButton';
-import { WishlistButton } from '@/components/product/WishlistButton';
-import { Shield, Truck, RotateCcw, Star, AlertTriangle } from 'lucide-react';
+import Link from 'next/link';
+import { Star, ChevronRight } from 'lucide-react';
 import { parseImages } from '@/lib/utils';
-
 import prisma from '@/lib/prisma';
+import { ProductImageGallery } from '@/components/product/ProductImageGallery';
+import { ProductDetailsClient } from '@/components/product/ProductDetailsClient';
 
 const getProduct = async (id: string) => {
   return await prisma.product.findUnique({
     where: { id },
     include: {
+      category: true,
       reviews: {
         include: { user: true },
-        orderBy: { createdAt: 'desc' }
-      }
-    }
+        orderBy: { createdAt: 'desc' },
+      },
+    },
   });
 };
 
+/* ── Helpers ─────────────────────────────────── */
+function avgRating(reviews: { rating: number }[]) {
+  if (!reviews.length) return 0;
+  return reviews.reduce((s, r) => s + r.rating, 0) / reviews.length;
+}
+
+function ratingCounts(reviews: { rating: number }[]) {
+  const map: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  reviews.forEach((r) => { map[r.rating] = (map[r.rating] || 0) + 1; });
+  return map;
+}
+
+function getInitials(name?: string | null) {
+  if (!name) return '?';
+  return name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase();
+}
+
+/* ── Page ────────────────────────────────────── */
 export default async function ProductPage({ params }: { params: { id: string } }) {
   const product = await getProduct(params.id);
+  if (!product) notFound();
 
-  if (!product) {
-    notFound();
-  }
+  const images = parseImages(product.images);
+  const avg = avgRating(product.reviews);
+  const counts = ratingCounts(product.reviews);
+  const total = product.reviews.length;
+
+  const finalPrice =
+    product.discountPercent > 0
+      ? product.price * (1 - product.discountPercent / 100)
+      : product.price;
 
   return (
-    <div className="container mx-auto px-4 py-16 text-neutral-900">
-      <div className="flex flex-col md:flex-row gap-12 lg:gap-20">
-        
-        {/* Product Image Gallery (Simplified) */}
-        <div className="w-full md:w-1/2">
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-white border border-neutral-100 shadow-md">
-            <Image 
-              src={parseImages(product.images)[0] || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=1200&auto=format&fit=crop'} 
-              alt={product.name} 
-              fill 
-              className="object-cover hover:scale-105 transition-transform duration-700" 
+    <div className="min-h-screen bg-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-1.5 text-sm text-neutral-500 mb-8">
+          <Link href="/" className="hover:text-neutral-900 transition-colors">Home</Link>
+          <ChevronRight className="w-3.5 h-3.5" />
+          <span className="text-neutral-900 font-medium">Product details</span>
+        </nav>
+
+        {/* ── Two-column layout ── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16">
+
+          {/* Left — Image gallery */}
+          <ProductImageGallery images={images} productName={product.name} />
+
+          {/* Right — Details */}
+          <div className="flex flex-col">
+            {/* Category */}
+            {product.category && (
+              <span className="text-xs font-semibold text-neutral-400 tracking-widest uppercase mb-2">
+                {product.category.name}
+              </span>
+            )}
+
+            {/* Product name */}
+            <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 mb-4 leading-tight">
+              {product.name}
+            </h1>
+
+            {/* Interactive details (client component) */}
+            <ProductDetailsClient
+              product={{
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                discountPercent: product.discountPercent,
+                description: product.description,
+                stock: product.stock,
+                image: images[0] || '',
+              }}
             />
           </div>
         </div>
 
-        {/* Product Details */}
-        <div className="w-full md:w-1/2 flex flex-col justify-center">
-          <div className="mb-2 text-sm font-bold text-[#E94560] tracking-wide uppercase">New Arrival</div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-[#1A1A2E] mb-4 tracking-tight leading-tight">
-            {product.name}
-          </h1>
-          <div className="text-3xl font-bold text-neutral-900 mb-4 flex items-end gap-3">
-            {product.discountPercent > 0 ? (
-              <>
-                <span className="text-[#E94560]">${(product.price * (1 - product.discountPercent / 100)).toFixed(2)}</span>
-                <span className="text-xl text-neutral-400 line-through mb-0.5">${product.price.toFixed(2)}</span>
-                <span className="text-sm font-bold bg-[#E94560]/10 text-[#E94560] px-2 py-1 rounded-lg mb-1">{product.discountPercent}% OFF</span>
-              </>
-            ) : (
-              <span>${product.price.toFixed(2)}</span>
-            )}
-          </div>
+        {/* ── Rating & Reviews ── */}
+        <section className="mt-20 pt-12 border-t border-neutral-200">
+          <h2 className="text-2xl font-bold text-neutral-900 mb-8">Rating &amp; Reviews</h2>
 
-          {/* Stock Status */}
-          {product.stock <= 0 ? (
-            <div className="flex items-center gap-2 mb-6 px-4 py-3 bg-red-50 border border-red-200 rounded-lg">
-              <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0" />
-              <span className="text-red-700 font-semibold">Out of Stock</span>
-            </div>
-          ) : product.stock <= 5 ? (
-            <div className="flex items-center gap-2 mb-6 px-4 py-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0" />
-              <span className="text-amber-700 font-semibold">Only {product.stock} left in stock — order soon!</span>
-            </div>
+          {total === 0 ? (
+            <p className="text-neutral-400 italic">No reviews yet. Be the first to review this product!</p>
           ) : (
-            <div className="mb-6 text-sm text-green-600 font-medium">✓ In Stock ({product.stock} available)</div>
-          )}
+            <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-12">
 
-          <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-            {product.description}
-          </p>
-          
-          <div className="space-y-4 mb-8">
-            <h3 className="font-semibold text-[#1A1A2E] text-lg">Key Features</h3>
-            <ul className="list-disc pl-5 text-gray-600 space-y-2">
-              {['Premium Quality', 'Fast Shipping', '24/7 Support'].map((feature, idx) => (
-                <li key={idx}>{feature}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4 align-middle mb-10 pt-6 border-t border-gray-200">
-            <AddToCartButton product={{ id: product.id, name: product.name, price: product.discountPercent > 0 ? (product.price * (1 - product.discountPercent / 100)) : product.price, image: parseImages(product.images)[0] }} stock={product.stock} />
-            <WishlistButton productId={product.id} />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 border-t border-gray-200">
-            <div className="flex flex-col items-center text-center space-y-2">
-              <div className="p-3 bg-blue-50 text-[#0F3460] rounded-full"><Truck className="w-6 h-6"/></div>
-              <span className="text-sm font-medium text-[#1A1A2E]">Free Shipping</span>
-            </div>
-            <div className="flex flex-col items-center text-center space-y-2">
-              <div className="p-3 bg-blue-50 text-[#0F3460] rounded-full"><Shield className="w-6 h-6"/></div>
-              <span className="text-sm font-medium text-[#1A1A2E]">2 Year Warranty</span>
-            </div>
-            <div className="flex flex-col items-center text-center space-y-2">
-              <div className="p-3 bg-blue-50 text-[#0F3460] rounded-full"><RotateCcw className="w-6 h-6"/></div>
-              <span className="text-sm font-medium text-[#1A1A2E]">30 Day Returns</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      {/* Reviews Section */}
-      <div className="mt-24 border-t border-neutral-200 pt-16">
-        <h2 className="text-3xl font-bold text-[#1A1A2E] mb-8">Customer Reviews</h2>
-        
-        {product.reviews.length === 0 ? (
-          <p className="text-neutral-500 italic">No reviews yet. Be the first to review this product!</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {product.reviews.map((review) => (
-              <div key={review.id} className="bg-white p-6 rounded-xl border border-neutral-100 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="font-semibold text-[#1A1A2E]">{review.user.name || 'Anonymous User'}</div>
-                  <div className="flex">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className={`w-4 h-4 ${star <= review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-neutral-300'}`} />
-                    ))}
-                  </div>
+              {/* Left — aggregate score */}
+              <div className="flex flex-col justify-center">
+                <div className="flex items-end gap-2 mb-1">
+                  <span className="text-7xl font-extrabold text-neutral-900 leading-none">
+                    {avg.toFixed(1).replace('.', ',')}
+                  </span>
+                  <span className="text-2xl text-neutral-400 mb-2">/ 5</span>
                 </div>
-                {review.comment && <p className="text-gray-600">{review.comment}</p>}
-                <div className="text-xs text-neutral-400 mt-4">{new Date(review.createdAt).toLocaleDateString()}</div>
+                <p className="text-sm text-neutral-500 mb-6">({total} New Review{total !== 1 ? 's' : ''})</p>
+
+                {/* Star bars */}
+                <div className="space-y-2">
+                  {[5, 4, 3, 2, 1].map((star) => {
+                    const count = counts[star] || 0;
+                    const pct = total > 0 ? (count / total) * 100 : 0;
+                    return (
+                      <div key={star} className="flex items-center gap-3">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                        <span className="text-sm text-neutral-500 w-2">{star}</span>
+                        <div className="flex-1 h-2 bg-neutral-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-neutral-900 rounded-full transition-all duration-500"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-neutral-400 w-4 text-right">{count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            ))}
-          </div>
-        )}
+
+              {/* Right — review cards */}
+              <div className="space-y-5">
+                {product.reviews.map((review) => (
+                  <div key={review.id} className="border border-neutral-100 rounded-2xl p-6 shadow-sm">
+                    <div className="flex items-start justify-between mb-3">
+                      <p className="font-semibold text-neutral-900">{review.user.name || 'Anonymous'}</p>
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <Star
+                            key={s}
+                            className={`w-4 h-4 ${s <= review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-neutral-200'}`}
+                          />
+                        ))}
+                        <span className="text-xs text-neutral-400 ml-2">
+                          {new Date(review.createdAt).toLocaleDateString('en-US', {
+                            day: 'numeric', month: 'short', year: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                    {review.comment && (
+                      <p className="text-sm text-neutral-600 leading-relaxed mb-4">{review.comment}</p>
+                    )}
+                    {/* Avatar row */}
+                    <div className="flex items-center gap-3 pt-3 border-t border-neutral-50">
+                      <div className="w-8 h-8 rounded-full bg-neutral-200 flex items-center justify-center text-xs font-semibold text-neutral-600 flex-shrink-0">
+                        {getInitials(review.user.name)}
+                      </div>
+                      <span className="text-xs text-neutral-400">{review.user.name || 'Anonymous User'}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
 
       </div>
     </div>

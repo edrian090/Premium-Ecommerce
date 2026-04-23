@@ -142,6 +142,26 @@ export async function POST(req: Request) {
       );
     }
 
+    // Update User Profile Automatically if it hasn't been completed yet
+    const dbUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { profileCompleted: true }
+    });
+
+    if (dbUser && !dbUser.profileCompleted) {
+      await prisma.user.update({
+        where: { id: session.user.id },
+        data: {
+          phone: shippingDetails.phone || undefined,
+          address: shippingDetails.address || undefined,
+          city: shippingDetails.city || undefined,
+          zip: shippingDetails.zip || undefined,
+          profileCompleted: true,
+          name: `${shippingDetails.firstName} ${shippingDetails.lastName}` // Update name implicitly if possible
+        }
+      });
+    }
+
     // Create the order in the database
     const order = await prisma.order.create({
       data: {

@@ -1,14 +1,18 @@
 'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { CheckCircle2, Loader2 } from "lucide-react";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const resetSuccess = searchParams.get("reset") === "success";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -55,6 +59,15 @@ export default function LoginPage() {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {resetSuccess && (
+            <div className="rounded-xl bg-emerald-50 p-4 border border-emerald-200 flex items-start gap-3 animate-fade-in">
+              <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+              <div className="text-sm text-emerald-700 font-semibold">
+                Password reset successfully. Please log in.
+              </div>
+            </div>
+          )}
+
           {error && (
             <div className="rounded-md bg-red-50 p-4 border border-red-200">
               <div className="text-sm text-red-700 font-semibold">{error}</div>
@@ -74,7 +87,15 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-neutral-700 mb-1">Password</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-sm font-medium text-neutral-700">Password</label>
+                <Link 
+                  href="/forgot-password" 
+                  className="text-xs font-semibold text-[#0F3460] hover:text-blue-500 transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <Input
                 type="password"
                 required
@@ -98,5 +119,20 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4">
+        <div className="w-full max-w-md flex flex-col items-center justify-center p-10 bg-white rounded-2xl shadow-xl border border-neutral-100">
+          <Loader2 className="h-8 w-8 text-[#0F3460] animate-spin" />
+          <p className="mt-4 text-sm text-neutral-500 font-semibold">Loading portal...</p>
+        </div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

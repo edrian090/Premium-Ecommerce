@@ -157,6 +157,14 @@ model Voucher {
   createdAt     DateTime  @default(now())
 }
 
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  email     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
 // NextAuth models
 model Account {
   id                 String  @id @default(cuid())

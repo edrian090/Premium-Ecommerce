@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import prisma from '@/lib/prisma';
 import Image from 'next/image';
+import { parseImages } from '@/lib/utils';
 
 export default async function Home() {
   // Let's fetch some products from the database later.
@@ -44,7 +45,7 @@ export default async function Home() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
             {featuredProducts.map((product) => {
-              const images = JSON.parse(product.images || '[]');
+              const images = parseImages(product.images);
               return (
               <div key={product.id} className="group flex flex-col">
                 <Link href={`/product/${product.id}`} className="block relative aspect-square overflow-hidden bg-neutral-100 rounded-2xl mb-4">

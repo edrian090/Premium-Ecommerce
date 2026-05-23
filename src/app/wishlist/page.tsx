@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { HeartCrack } from "lucide-react";
 import { redirect } from "next/navigation";
 import { WishlistButton } from "@/components/product/WishlistButton";
+import { parseImages } from "@/lib/utils";
 
 export default async function WishlistPage() {
   const session = await getServerSession(authOptions);
@@ -50,7 +51,7 @@ export default async function WishlistPage() {
           <div key={product.id} className="group overflow-hidden border border-neutral-100 shadow-sm hover:shadow-xl transition-all duration-300 rounded-xl bg-white flex flex-col">
             <div className="relative aspect-square overflow-hidden bg-gray-100">
               <Image 
-                src={JSON.parse(product.images || '[]')?.[0] || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop'} 
+                src={parseImages(product.images)?.[0] || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop'} 
                 alt={product.name} 
                 fill 
                 className="object-cover transition-transform duration-500 group-hover:scale-110" 

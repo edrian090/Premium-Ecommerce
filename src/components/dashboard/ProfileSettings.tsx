@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { User, Phone, MapPin, Loader2, Save, CheckCircle2 } from 'lucide-react';
 
 interface ProfileSettingsProps {
@@ -13,6 +14,7 @@ interface ProfileSettingsProps {
 }
 
 export function ProfileSettings({ user }: ProfileSettingsProps) {
+  const router = useRouter();
   const [phone, setPhone] = useState(user.phone || '');
   const [address, setAddress] = useState(user.address || '');
   const [city, setCity] = useState(user.city || '');
@@ -21,6 +23,14 @@ export function ProfileSettings({ user }: ProfileSettingsProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+
+  // Sync internal state if user prop updates from the server component
+  useEffect(() => {
+    setPhone(user.phone || '');
+    setAddress(user.address || '');
+    setCity(user.city || '');
+    setZip(user.zip || '');
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +53,7 @@ export function ProfileSettings({ user }: ProfileSettingsProps) {
       }
 
       setSuccess(true);
+      router.refresh();
       setTimeout(() => setSuccess(false), 3000);
     } catch (err: any) {
       setError(err.message);

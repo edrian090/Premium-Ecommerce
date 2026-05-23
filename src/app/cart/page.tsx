@@ -6,12 +6,9 @@ import { Minus, Plus, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
 export default function CartPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+  const { status } = useSession();
   const { items, removeItem, updateQuantity, getCartTotal, clearCart } = useCartStore();
   const total = getCartTotal();
 

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useSession, signOut, signIn } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { useCartStore } from '@/store/cartStore';
 import { ShoppingCart, User, Search, ChevronDown, LogOut, Package, Heart, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';

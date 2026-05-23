@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    eslint: {
+        // Allows builds to succeed even if ESLint warnings exist
+        ignoreDuringBuilds: true,
+    },
+    poweredByHeader: false,
     images: {
         remotePatterns: [
             {

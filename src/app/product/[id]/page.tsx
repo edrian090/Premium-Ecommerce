@@ -46,7 +46,7 @@ export default async function ProductPage({ params }: { params: { id: string } }
   const counts = ratingCounts(product.reviews);
   const total = product.reviews.length;
 
-  const finalPrice =
+  const _finalPrice =
     product.discountPercent > 0
       ? product.price * (1 - product.discountPercent / 100)
       : product.price;

@@ -2,7 +2,6 @@ import prisma from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { PackageSearch } from "lucide-react";
 
 import { parseImages } from "@/lib/utils";

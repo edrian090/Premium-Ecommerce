@@ -46,7 +46,6 @@ export function Header() {
           </Link>
           <Link href="/deals" className="hover:text-[#003d29] transition-colors">Deals</Link>
           <Link href="/new" className="hover:text-[#003d29] transition-colors">What's New</Link>
-          <Link href="/delivery" className="hover:text-[#003d29] transition-colors">Delivery</Link>
         </nav>
         
         {/* Right: Search and Actions */}

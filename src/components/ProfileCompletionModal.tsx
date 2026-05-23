@@ -68,42 +68,53 @@ export function ProfileCompletionModal() {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={handleSkip} />
+      <div 
+        className="absolute inset-0 bg-[#00140e]/75 backdrop-blur-md transition-opacity duration-300" 
+        onClick={handleSkip} 
+      />
       
-      {/* Modal */}
-      <div className="relative w-full max-w-md mx-4 animate-in fade-in zoom-in-95 duration-300">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          {/* Header with gradient */}
-          <div className="relative bg-gradient-to-br from-[#0F3460] via-[#16213E] to-[#1A1A2E] px-8 pt-8 pb-12">
-            <button 
-              onClick={handleSkip}
-              className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
-            >
-              <X className="h-5 w-5" />
-            </button>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 bg-white/10 rounded-lg">
-                <Sparkles className="h-6 w-6 text-amber-300" />
+      {/* Modal Container */}
+      <div className="relative w-full max-w-lg mx-4 z-10 animate-in fade-in zoom-in-95 duration-300">
+        <div className="bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,61,41,0.15)] border border-neutral-100 overflow-hidden">
+          
+          {/* Top Decorative Branding Accent Line */}
+          <div className="h-2 w-full bg-gradient-to-r from-[#003d29] via-[#005a3d] to-amber-400" />
+          
+          {/* Close button */}
+          <button 
+            onClick={handleSkip}
+            className="absolute top-6 right-6 text-neutral-400 hover:text-neutral-900 transition-colors p-2 hover:bg-neutral-50 rounded-full"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
+
+          {/* Modal Header */}
+          <div className="px-8 pt-8 pb-4 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row items-center gap-4 mb-2">
+              <div className="p-3 bg-[#003d29]/5 rounded-2xl text-[#003d29] border border-[#003d29]/10 shrink-0">
+                <Sparkles className="h-6 w-6 text-amber-500 fill-amber-500/20 animate-pulse" />
               </div>
-              <h2 className="text-2xl font-bold text-white">Complete Your Profile</h2>
+              <div>
+                <h2 className="text-2xl font-black text-[#1A1A2E] tracking-tight">Complete Your Profile</h2>
+                <p className="text-neutral-500 text-sm mt-1">Add your details for a faster, premium checkout experience.</p>
+              </div>
             </div>
-            <p className="text-white/70 text-sm leading-relaxed">
-              Add your contact details for a smoother checkout experience. You can always update these later.
-            </p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="px-8 pb-8 -mt-6">
-            <div className="bg-white rounded-xl shadow-lg border border-neutral-100 p-6 space-y-5">
+          <form onSubmit={handleSubmit} className="px-8 pb-8 pt-2">
+            <div className="space-y-5">
               {error && (
-                <div className="rounded-lg bg-red-50 p-3 border border-red-200">
-                  <p className="text-sm text-red-700 font-medium">{error}</p>
+                <div className="rounded-2xl bg-red-50 p-4 border border-red-200">
+                  <p className="text-sm text-red-700 font-semibold">{error}</p>
                 </div>
               )}
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-neutral-700 flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-[#0F3460]" />
+              {/* Phone Input */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-neutral-500 flex items-center gap-2">
+                  <Phone className="h-3.5 w-3.5 text-[#003d29]" />
                   Phone Number
                 </label>
                 <Input
@@ -111,64 +122,66 @@ export function ProfileCompletionModal() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="e.g. +63 912 345 6789"
-                  className="h-12 text-base border-neutral-200 focus-visible:ring-[#0F3460]"
+                  className="h-12 text-sm border-neutral-200 focus-visible:ring-[#003d29] focus-visible:border-[#003d29] rounded-xl pl-4"
                   required
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-neutral-700 flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-[#0F3460]" />
-                  Address
+              {/* Address Input */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-neutral-500 flex items-center gap-2">
+                  <MapPin className="h-3.5 w-3.5 text-[#003d29]" />
+                  Delivery Address
                 </label>
                 <Input
                   type="text"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="Street, Building, Unit"
-                  className="h-12 text-base border-neutral-200 focus-visible:ring-[#0F3460]"
+                  placeholder="Street name, building, apartment/unit"
+                  className="h-12 text-sm border-neutral-200 focus-visible:ring-[#003d29] focus-visible:border-[#003d29] rounded-xl pl-4"
                   required
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-neutral-700">City</label>
+              {/* City & ZIP Code */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-neutral-500">City</label>
                   <Input
                     type="text"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    placeholder="City"
-                    className="h-12 text-base border-neutral-200 focus-visible:ring-[#0F3460]"
+                    placeholder="e.g. Manila"
+                    className="h-12 text-sm border-neutral-200 focus-visible:ring-[#003d29] focus-visible:border-[#003d29] rounded-xl pl-4"
                     required
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-neutral-700">ZIP Code</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-neutral-500">ZIP Code</label>
                   <Input
                     type="text"
                     value={zip}
                     onChange={(e) => setZip(e.target.value)}
-                    placeholder="ZIP"
-                    className="h-12 text-base border-neutral-200 focus-visible:ring-[#0F3460]"
+                    placeholder="e.g. 1000"
+                    className="h-12 text-sm border-neutral-200 focus-visible:ring-[#003d29] focus-visible:border-[#003d29] rounded-xl pl-4"
                     required
                   />
                 </div>
               </div>
 
-              <div className="flex gap-3 pt-2">
-                <Button
+              {/* Action Buttons */}
+              <div className="flex items-center gap-4 pt-4">
+                <button
                   type="button"
-                  variant="outline"
                   onClick={handleSkip}
-                  className="flex-1 h-12 text-neutral-500 border-neutral-200 hover:bg-neutral-50"
+                  className="flex-1 h-12 rounded-full border border-neutral-200 text-neutral-600 hover:text-neutral-900 font-bold text-xs tracking-wider uppercase hover:bg-neutral-50 active:scale-[0.98] transition-all duration-200"
                 >
                   Skip for now
-                </Button>
+                </button>
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 h-12 bg-gradient-to-r from-[#0F3460] to-[#1A1A2E] hover:from-[#1A1A2E] hover:to-[#0F3460] text-white font-semibold transition-all duration-300"
+                  className="flex-1 h-12 bg-[#003d29] hover:bg-[#002b1c] text-white font-bold text-xs tracking-wider uppercase rounded-full shadow-[0_4px_12px_rgba(0,61,41,0.2)] hover:shadow-[0_6px_16px_rgba(0,61,41,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
                 >
                   {loading ? 'Saving...' : 'Save & Continue'}
                 </Button>
